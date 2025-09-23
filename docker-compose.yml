@@ -4,9 +4,8 @@ services:
   whisperx-api:
     build: .
     container_name: whisperx-api
-    runtime: nvidia
     environment:
-      HF_TOKEN: ${HF_TOKEN}   
+      HF_TOKEN: ${HF_TOKEN}
     ports:
       - "8000:8000"
     deploy:
