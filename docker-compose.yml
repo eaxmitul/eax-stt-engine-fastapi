@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  whisperx-api:
+    build: .
+    container_name: whisperx-api
+    runtime: nvidia
+    environment:
+      HF_TOKEN: ${HF_TOKEN}   
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
