@@ -38,8 +38,15 @@ def load_models():
             "large-v3",
             device,
             compute_type=compute_type,
-            asr_options={"max_new_tokens": None}
+            asr_options={
+                "max_new_tokens": None,
+                "multilingual": True,                       # or False as needed
+                "clip_timestamps": False,                   # set as needed
+                "hallucination_silence_threshold": 0.0,     # set as needed
+                "hotwords": None                            # or a list of hotwords
+            }
         )
+
         logger.info("WhisperX model loaded successfully.")
     except Exception as e:
         logger.exception("Failed to load WhisperX model")
