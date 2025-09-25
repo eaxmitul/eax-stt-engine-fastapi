@@ -47,8 +47,6 @@ RUN python3 -m pytorch_lightning.utilities.upgrade_checkpoint \
       /usr/local/lib/python3.10/dist-packages/whisperx/assets/pytorch_model.bin
 
 COPY . .
-...
-
 
 ENV PYTHONUNBUFFERED=1
 
