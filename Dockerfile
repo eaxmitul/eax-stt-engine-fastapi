@@ -22,10 +22,10 @@ COPY requirements.txt .
 RUN pip3 install --upgrade pip setuptools wheel
 RUN pip3 install -r requirements.txt
 
-# Manually download VAD model to expected cache location for WhisperX
+# Download VAD model with correct filename (whisperx expects this exact name)
 RUN mkdir -p /root/.cache/whisperx/models \
-    && curl -L https://huggingface.co/pyannote/segmentation/raw/main/pytorch/model.pt \
-       -o /root/.cache/whisperx/models/vad_segmenter.pt
+    && curl -L https://huggingface.co/pyannote/segmentation/resolve/main/pytorch_model.bin \
+       -o /root/.cache/whisperx/models/whisperx-vad-segmentation.bin
 
 COPY . .
 
