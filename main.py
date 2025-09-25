@@ -57,6 +57,7 @@ async def startup_event():
     load_models()
 
 
+
 # Transcription Endpoint
 @app.post("/transcribe_audio")
 async def transcribe_audio(
@@ -99,17 +100,27 @@ async def transcribe_audio(
         result = whisperx.align(result["segments"], model_a, metadata, audio, device, return_char_alignments=False)
         logger.info(f"[{request_id}] Alignment complete.")
 
-        # Diarization
         if diarize:
             if not HF_TOKEN:
                 logger.error(f"[{request_id}] Hugging Face token missing for diarization")
                 raise HTTPException(status_code=400, detail="Hugging Face token is required for diarization.")
 
-            logger.info(f"[{request_id}] Performing diarization...")
+            logger.info(f"[{request_id}] Performing diarization with optimized settings...")
             diarize_model = whisperx.DiarizationPipeline(use_auth_token=HF_TOKEN, device=device)
-            diarize_segments = diarize_model(audio)
+
+            diarize_model.model.embedding_batch_size = 8
+            diarize_model.model.segmentation_batch_size = 4
+
+            # Specify expected speaker count range (adjust as needed)
+            diarize_segments = diarize_model(
+                audio,
+                min_speakers=2,
+                max_speakers=4
+            )
+
+            # Assign speakers to words
             result = whisperx.assign_word_speakers(diarize_segments, result)
-            logger.info(f"[{request_id}] Diarization complete.")
+            logger.info(f"[{request_id}] Diarization complete (optimized).")
 
         logger.info(f"[{request_id}] Request completed successfully.")
         return {"request_id": request_id, "segments": result["segments"]}
