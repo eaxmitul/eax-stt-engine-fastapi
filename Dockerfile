@@ -39,7 +39,6 @@ FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# System deps
 RUN apt-get update && apt-get install -y \
     git \
     ffmpeg \
@@ -52,10 +51,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy requirements
 COPY requirements.txt .
 
-# Install deps
 RUN pip3 install --upgrade pip setuptools wheel
 RUN pip3 install -r requirements.txt
 
