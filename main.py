@@ -3,10 +3,16 @@ import shutil
 import logging
 import uuid
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request
-import torch
 import whisperx
 from typing import Optional
 
+import torch
+
+# Fix cudnn "plan failed" spam, ensure reproducibility
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
 
 # Logging Setup
 logging.basicConfig(
