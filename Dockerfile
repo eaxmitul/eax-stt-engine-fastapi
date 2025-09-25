@@ -32,10 +32,15 @@ WORKDIR /app
 COPY requirements.txt .
 
 # 1. Upgrade PyTorch to 2.3.1+cu121 before installing other dependencies
-RUN pip3 install --upgrade torch==2.3.1+cu121 torchvision==0.15.2+cu121 torchaudio==2.3.1+cu121 \
-       --index-url https://download.pytorch.org/whl/cu121 \
+# 1. Upgrade PyTorch, TorchVision, and Torchaudio to supported 2.3.1+cu121 versions
+RUN pip3 install --upgrade \
+      torch==2.3.1+cu121 \
+      torchvision==0.16.0+cu121 \
+      torchaudio==2.3.1+cu121 \
+      --index-url https://download.pytorch.org/whl/cu121 \
     && pip3 install --upgrade pip setuptools wheel \
     && pip3 install -r requirements.txt
+
 
 # 2. Download VAD model
 RUN mkdir -p /root/.cache/whisperx/models \
