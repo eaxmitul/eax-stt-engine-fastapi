@@ -27,20 +27,16 @@ WORKDIR /app
 #     && curl -L https://huggingface.co/pyannote/segmentation/resolve/main/pytorch_model.bin \
 #        -o /root/.cache/whisperx/models/whisperx-vad-segmentation.bin
 
-# COPY . .
 # Copy requirements
 COPY requirements.txt .
 
-# 1. Upgrade PyTorch to 2.3.1+cu121 before installing other dependencies
-# 1. Upgrade PyTorch, TorchVision, and Torchaudio to supported 2.3.1+cu121 versions
+# 1. Upgrade PyTorch and Torchaudio to 2.3.1+cu121 (skip torchvision)
 RUN pip3 install --upgrade \
       torch==2.3.1+cu121 \
-      torchvision==0.16.0+cu121 \
       torchaudio==2.3.1+cu121 \
       --index-url https://download.pytorch.org/whl/cu121 \
     && pip3 install --upgrade pip setuptools wheel \
     && pip3 install -r requirements.txt
-
 
 # 2. Download VAD model
 RUN mkdir -p /root/.cache/whisperx/models \
