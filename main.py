@@ -64,8 +64,9 @@ async def startup_event():
     load_models()
 
 async def verify_api_key(x_api_key: str = Header(...)):
+    
     if x_api_key != API_KEY:
-        logger.warning(f"Unauthorized Access: {x_api_key}")
+        logger.warning(f"Unauthorized Access: {x_api_key}. Expected: {API_KEY}")
         raise HTTPException(status_code=401, detail="Unauthorized Access")
 
 # Transcription Endpoint
