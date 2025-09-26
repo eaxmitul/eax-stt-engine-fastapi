@@ -1,22 +1,16 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
 import shutil
 import logging
 import uuid
-from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Header , Depends
-import whisperx
 from typing import Optional
+
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Header, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import whisperx
 import torch
 
-API_KEY = os.getenv("API_KEY")
-
-
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cudnn.allow_tf32 = True
+load_dotenv()
 
 # Logging Setup
 logging.basicConfig(
@@ -26,12 +20,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger("whisperx-api")
 
+# Load keys from environment
+API_KEY = os.getenv("API_KEY")
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-# Config
-HF_TOKEN = os.environ.get("HF_TOKEN")
+if not API_KEY:
+    logger.warning("⚠️ Environment variable API_KEY is not set!")
+else:
+    logger.info("✅ API_KEY loaded from environment")
+
 app = FastAPI(title="WhisperX API")
 
-# Global variables
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Torch + CUDA settings
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+
+# Global WhisperX model vars
 model = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
 batch_size = 16
