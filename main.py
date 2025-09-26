@@ -2,13 +2,14 @@ import os
 import shutil
 import logging
 import uuid
-from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request, Header , Depends
 import whisperx
 from typing import Optional
-
 import torch
 
-# Fix cudnn "plan failed" spam, ensure reproducibility
+API_KEY = os.getenv("API_KEY")
+
+
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 torch.backends.cuda.matmul.allow_tf32 = True
@@ -62,7 +63,10 @@ def load_models():
 async def startup_event():
     load_models()
 
-
+async def verify_api_key(x_api_key: str = Header(...)):
+    if x_api_key != API_KEY:
+        logger.warning(f"Unauthorized Access: {x_api_key}")
+        raise HTTPException(status_code=401, detail="Unauthorized Access")
 
 # Transcription Endpoint
 @app.post("/transcribe_audio")
@@ -70,7 +74,9 @@ async def transcribe_audio(
     request: Request,
     file: UploadFile = File(...),
     language: Optional[str] = "en",
-    diarize: Optional[bool] = False
+    diarize: Optional[bool] = False,
+    _=Depends(verify_api_key)  # Enforce API key check
+
 ):
     """
     Transcribes an audio file with speaker diarization and word timestamps.
